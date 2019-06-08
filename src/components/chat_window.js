@@ -7,8 +7,6 @@ import appState from '../store'
 
 import './chat_window.css'
 
-const {ipcRenderer} = window.require('electron')
-
 class ChatWindow extends React.Component{
 
   render(){
@@ -26,9 +24,7 @@ class ChatWindow extends React.Component{
           {displayMessages}
         </div>
         <Formik initialValues={{ "message": "" }}
-          onSubmit={(values, actions) => {
-            ipcRenderer.send('send-message',values['message'])
-          }}
+          onSubmit={appState.sendMessage}
           render={({errors, status, touched, isSubmitting})=>(
             <Form>
               <Field name="message" type="text"/>

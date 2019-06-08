@@ -8,6 +8,15 @@ const url = require('url')
 const isDev = require('electron-is-dev')
 
 const net = require('net')
+const { default: installExtension, REACT_DEVELOPER_TOOLS, MOBX_DEVTOOLS } = require('electron-devtools-installer');
+
+installExtension(REACT_DEVELOPER_TOOLS)
+  .then((name) => console.log(`Added Extension:  ${name}`))
+  .catch((err) => console.log('An error occurred: ', err));
+
+installExtension(MOBX_DEVTOOLS)
+  .then((name) => console.log(`Added Extension:  ${name}`))
+  .catch((err) => console.log('An error occurred: ', err));
 
 let mainWindow;
 let client = new net.Socket()

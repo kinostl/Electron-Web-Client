@@ -1,23 +1,21 @@
 import React from 'react'
 import { Formik, Form, Field, ErrorMessage } from 'formik'
-import PouchDB from 'pouchdb-browser'
-let characters = new PouchDB('characters')
 
-class AddCharacter extends React.Component{
+import appState from '../store'
+
+const newWorld = {
+  "label":"",
+  "name":"",
+  "password":"",
+  "server_address":"",
+  "server_port":""
+}
+
+class AddWorld extends React.Component{
   render(){
     return (
-      <Formik initialValues={{"name":""}}
-      onSubmit={(values, actions)=>{
-        values['_id']=values['label']
-        characters.put(values).then(function(response){
-          console.log("Character added")
-          console.log(response)
-          actions.setSubmitting(false)
-        }).catch(function(err){
-          actions.setSubmitting(false)
-          actions.setErrors(err)
-        })
-      }}
+      <Formik initialValues={newWorld}
+      onSubmit={appState.addWorld}
       render={({errors, status, touched, isSubmitting})=>(
       <Form>
         <header className="App-header">
@@ -34,8 +32,8 @@ class AddCharacter extends React.Component{
         <Field name="password" type="password"/>
         <ErrorMessage name="name" />
 
-        <label htmlFor="server_url">Server URL</label>
-        <Field name="server_url" type="url"/>
+        <label htmlFor="server_address">Server Address</label>
+        <Field name="server_address" type="text"/>
         <ErrorMessage name="server_url" />
         <label htmlFor="server_port">Server Port</label>
         <Field name="server_port" type="text"/>
@@ -50,4 +48,4 @@ class AddCharacter extends React.Component{
   }
 }
 
-export default AddCharacter;
+export default AddWorld;
