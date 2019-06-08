@@ -1,10 +1,11 @@
-const electron = require('electron');
-const app = electron.app;
-const BrowserWindow = electron.BrowserWindow;
+const electron = require('electron')
+const app = electron.app
+const BrowserWindow = electron.BrowserWindow
+const ipcMain = electron.ipcMain
 
-const path = require('path');
-const url = require('url');
-const isDev = require('electron-is-dev');
+const path = require('path')
+const url = require('url')
+const isDev = require('electron-is-dev')
 
 const net = require('net')
 
@@ -20,17 +21,23 @@ function createWindow() {
    }
   })
   mainWindow.webContents.openDevTools()
-  mainWindow.loadURL(isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, '../build/index.html')}`);
-  mainWindow.on('closed', () => mainWindow = null);
-  mainWindow.webContents.send('telnet-data', "CONNECTED")
-  client.connect(4201, 'erebor.localecho.net',function(){
-    console.log('Connected')
-    mainWindow.webContents.send('telnet-data', "CONNECTED")
+  mainWindow.loadURL(isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, '../build/index.html')}`).then(()=>{
+    client.connect(4201, 'erebor.localecho.net')
+
+    client.on('data', function(data){
+      console.log(data.toString())
+      mainWindow.webContents.send('telnet-data', data.toString())
+    })
+
+    ipcMain.on('send-message',(event, args)=>{
+      console.log("Received message. Sending.")
+      console.log(args)
+      args = args+"\n\r"
+      client.write(args)
+    })
   })
 
-  client.on('data', function(data){
-    mainWindow.webContents.send('telnet-data', data.toString())
-  })
+  mainWindow.on('closed', () => mainWindow = null);
 }
 
 app.on('ready', createWindow);

@@ -1,3 +1,6 @@
 .message{
     white-space: pre-wrap;
+    font-family: monospace;
+    background-color: darkslategray;
+    color: whitesmoke;
 }
