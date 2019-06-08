@@ -1,14 +1,16 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
+import React from 'react'
+import ReactDOM from 'react-dom'
 
-import App from './App';
-import * as serviceWorker from './serviceWorker';
+import App from './App'
+import * as serviceWorker from './serviceWorker'
+
+import appState from './store'
 
 const {ipcRenderer} = window.require('electron')
 
+
 ipcRenderer.on('telnet-data', (event, arg) =>{
-  console.log("hello")
-  console.log(arg)
+  appState.addMessage(arg)  
 })
 
 ReactDOM.render(<App />, document.getElementById('root'));

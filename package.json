@@ -6,6 +6,7 @@
 	"main": "public/electron.js",
 	"homepage": "./",
 	"dependencies": {
+		"ansi-to-react": "^5.0.0",
 		"electron-is-dev": "^1.1.0",
 		"formik": "^1.5.7",
 		"mobx": "^5.10.0",
