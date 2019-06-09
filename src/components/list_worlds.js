@@ -13,8 +13,8 @@ class ListWorlds extends React.Component{
 
     appState.connections.forEach((connection)=>{
       connections.push(<li key={connection['world']['_id']}>
-        <button onClick={(e)=>console.log(connection)}>
-          {connection['world']['label']}
+        <button onClick={(e)=>appState.selectConnection(connection)}>
+          {connection['world']['label']} [Connected]
         </button>
       </li>)
     })

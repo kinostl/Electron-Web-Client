@@ -5,10 +5,10 @@ const {ipcRenderer} = window.require('electron')
 
 let worlds = new PouchDB('worlds')
 
-let appState= observable({
-  worlds: new Map(),
-  connections: new Map(),
-  messages: ["Hello!"]
+let appState = observable({
+    selectedConnection: null,
+    worlds: new Map(),
+    connections: new Map()
 })
 
 worlds.allDocs({include_docs:true}).then((results)=>{
@@ -27,7 +27,10 @@ appState.addMessage = action((args)=>{
 
 appState.sendData = action((values, actions) => {
     actions.resetForm()
-    ipcRenderer.send('sendData', values['message'])
+    ipcRenderer.send('sendData',
+        appState.selectedConnection['world']['_id'],
+        values['message']
+    )
 })
 
 appState.addWorld = action((values, actions) => {
@@ -42,6 +45,13 @@ appState.addWorld = action((values, actions) => {
     })
 })
 
+appState.getSelectedMessages = action(()=>{
+    if(appState.selected_id){
+        return appState.connections[appState.selected_id]['messages']
+    }
+    return []
+})
+
 appState.addConnection = action((world)=>{
     let connection = {
         "world": world,
@@ -49,6 +59,11 @@ appState.addConnection = action((world)=>{
     }
     appState.connections.set(world['_id'],connection)
     appState.worlds.delete(world['_id'])
+})
+
+appState.selectConnection = action((connection)=>{
+    appState.selectedConnection = connection
+    console.log("Selected")
 })
 
 appState.connectWorld = action((world)=>{

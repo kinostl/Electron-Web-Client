@@ -11,20 +11,25 @@ class ChatWindow extends React.Component{
 
   render(){
     let displayMessages = []
-    for(let appMessage of appState.messages){
-      displayMessages.push(
-        <Ansi>
-          {appMessage}
-        </Ansi>
-      )
+    if(appState.selectedConnection){
+      console.log(appState.selectedConnection.messages)
+      for(let appMessage of appState.selectedConnection.messages){
+        console.log(appMessage)
+        displayMessages.push(
+          <Ansi>
+            {appMessage}
+          </Ansi>
+        )
+      }
     }
+
     return (
       <div>
         <div className="message">
           {displayMessages}
         </div>
         <Formik initialValues={{ "message": "" }}
-          onSubmit={appState.sendMessage}
+          onSubmit={appState.sendData}
           render={({errors, status, touched, isSubmitting})=>(
             <Form>
               <Field name="message" type="text"/>

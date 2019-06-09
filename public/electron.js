@@ -51,8 +51,8 @@ app.on('activate', () => {
 
 ipcMain.on('sendData',(event, world_id, data)=>{
   let client=connections.get(world_id)
-  args = args+"\n\r"
-  client.write(args)
+  data = data+"\n\r"
+  client.write(data)
 })
 
 ipcMain.on('connectWorld',(event, world)=>{
@@ -68,8 +68,18 @@ ipcMain.on('connectWorld',(event, world)=>{
     })
   })
 
+  new_connection.on('error', (err) => {
+    console.log("Connection failed")
+    console.log(err)
+    mainWindow.webContents.send('connectionFailed', {
+      "world_id": world_id,
+      "error": err
+    })
+  })
+
   new_connection.on('end', 
   ()=>{
+    console.log("Closing connection")
     mainWindow.webContents.send('connectionClosed', {
       "world_id": world_id
     })
@@ -77,21 +87,12 @@ ipcMain.on('connectWorld',(event, world)=>{
 
   console.log("Sending connection request")
   new_connection.connect(
-    4201,
-    'erebor.localecho.net',
-    (err)=>{
+    world['server_port'] * 1,
+    world['server_address'],
+    () => {
       console.log("Connected.")
-      if(err){
-        console.log("Connection failed")
-        console.log(err)
-        mainWindow.webContents.send('connectionFailed', {
-          "world_id": world_id,
-          "error": err
-        })
-      }else{
-        console.log("Connection successful")
-        connections.set(world['_id'],new_connection)
-        mainWindow.webContents.send('connectionOpened', world)
-      }
+      connections.set(world['_id'], new_connection)
+      mainWindow.webContents.send('connectionOpened', world)
+
     })
 })
