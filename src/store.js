@@ -3,30 +3,38 @@ import PouchDB from 'pouchdb-browser'
 
 const {ipcRenderer} = window.require('electron')
 
-let characters = new PouchDB('characters')
+let worlds = new PouchDB('worlds')
 
 let appState= observable({
-  messages:[],
-  worlds: [],
-  connections: []
+  worlds: new Map(),
+  connections: new Map(),
+  messages: ["Hello!"]
 })
 
-appState.addMessage = action((message)=>{
-    appState.messages.push(message)
+worlds.allDocs({include_docs:true}).then((results)=>{
+    let rows = results['rows']
+    for(let row of rows){
+        let doc = row['doc']
+        let id=doc['_id']
+        appState.worlds.set(id, doc)
+    }
+ })
+
+
+appState.addMessage = action((args)=>{
+    appState.connections.get(args['world_id']).messages.push(args['data'])
 })
 
-appState.sendMessage = action((values, actions) => {
+appState.sendData = action((values, actions) => {
     actions.resetForm()
-    ipcRenderer.send('send-message', values['message'])
+    ipcRenderer.send('sendData', values['message'])
 })
 
 appState.addWorld = action((values, actions) => {
-    let _id = values['name'] + "@" + values['server_url'] + ":" + values['server_port']
+    let _id = values['label'] + "@" + values['server_address'] + ":" + values['server_port']
     values['_id'] = _id
-    characters.put(values).then(function (response) {
-        console.log("Character added")
-        console.log(response)
-        appState.worlds.push(values)
+    worlds.put(values).then(function () {
+        appState.worlds.set(_id, values)
         actions.setSubmitting(false)
     }).catch(function (err) {
         actions.setSubmitting(false)
@@ -34,14 +42,17 @@ appState.addWorld = action((values, actions) => {
     })
 })
 
-appState.addConnection = action((connection)=>{
-    /*
-    This isn't appropriate since it should actually
-    send a signal to the node-side to start up a new connection
-    then do something on here to display stuff
-    */
+appState.addConnection = action((world)=>{
+    let connection = {
+        "world": world,
+        "messages": []
+    }
+    appState.connections.set(world['_id'],connection)
+    appState.worlds.delete(world['_id'])
+})
 
-    appState.connections.push(connection)
+appState.connectWorld = action((world)=>{
+    ipcRenderer.send('connectWorld', world)
 })
 
 export default appState

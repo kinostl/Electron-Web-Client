@@ -9,8 +9,12 @@ import appState from './store'
 const {ipcRenderer} = window.require('electron')
 
 
-ipcRenderer.on('telnet-data', (event, arg) =>{
-  appState.addMessage(arg)  
+ipcRenderer.on('dataReceived', (event, arg) =>{
+  appState.addMessage(arg)
+})
+
+ipcRenderer.on('connectionOpened', (event, arg)=>{
+  appState.addConnection(arg)
 })
 
 ReactDOM.render(<App />, document.getElementById('root'));

@@ -1,6 +1,6 @@
 import React from 'react';
 import AddWorld from './components/add_world'
-import ListCharacters from './components/list_characters'
+import ListWorlds from './components/list_worlds'
 import ChatWindow from './components/chat_window'
 
 class App extends React.Component{
@@ -8,7 +8,7 @@ class App extends React.Component{
     return (
       <div className="App">
         <ChatWindow></ChatWindow>
-        <ListCharacters></ListCharacters>
+        <ListWorlds></ListWorlds>
         <AddWorld></AddWorld>
       </div>
     )
