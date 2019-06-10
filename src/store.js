@@ -33,6 +33,10 @@ appState.sendData = action((values, actions) => {
     )
 })
 
+appState.editWorld = action((value, actions)=>{
+    console.log(value)
+})
+
 appState.addWorld = action((values, actions) => {
     let _id = values['label'] + "@" + values['server_address'] + ":" + values['server_port']
     values['_id'] = _id
@@ -59,6 +63,17 @@ appState.addConnection = action((world)=>{
     }
     appState.connections.set(world['_id'],connection)
     appState.worlds.delete(world['_id'])
+})
+
+
+appState.closeConnection = action((args)=>{
+    if(args['error']){
+        //Do something more useful than this.
+        console.error(args['error'])
+    }
+    let world = appState.connections.get(args['world_id'])
+    appState.worlds.set(world['_id'], world)
+    appState.connections.delete(world['_id'])
 })
 
 appState.selectConnection = action((connection)=>{

@@ -1,16 +1,16 @@
-import React from 'react';
-import AddWorld from './components/add_world'
-import ListWorlds from './components/list_worlds'
-import ChatWindow from './components/chat_window'
+import React from 'react'
+import {MemoryRouter, Route} from 'react-router-dom'
+import ChatView from './views/chat_view'
+import SettingsView from './views/settings_view'
 
 class App extends React.Component{
   render(){
     return (
-      <div className="App">
-        <ChatWindow></ChatWindow>
-        <ListWorlds></ListWorlds>
-        <AddWorld></AddWorld>
-      </div>
+      <MemoryRouter>
+        <Route path="/" component={ChatView}/>
+        <Route path="/settings" component={SettingsView}/>
+      </MemoryRouter>
+      
     )
   }
 }

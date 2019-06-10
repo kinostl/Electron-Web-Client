@@ -17,6 +17,15 @@ ipcRenderer.on('connectionOpened', (event, arg)=>{
   appState.addConnection(arg)
 })
 
+ipcRenderer.on('connectionClosed', (event, args)=>{
+  appState.closeConnection(args)
+})
+
+ipcRenderer.on('connectionFailed', (event, args)=>{
+  appState.closeConnection(args)
+})
+
+
 ReactDOM.render(<App />, document.getElementById('root'));
 
 // If you want your app to work offline and load faster, you can change
