@@ -1,7 +1,7 @@
-import {observable, action} from 'mobx'
+import { observable, action } from 'mobx'
 import PouchDB from 'pouchdb-browser'
 
-const {ipcRenderer} = window.require('electron')
+const { ipcRenderer } = window.require('electron')
 
 let worlds = new PouchDB('worlds')
 
@@ -11,17 +11,21 @@ let appState = observable({
     connections: new Map()
 })
 
-worlds.allDocs({include_docs:true}).then((results)=>{
+worlds.allDocs({ include_docs: true }).then((results) => {
     let rows = results['rows']
-    for(let row of rows){
+    for (let row of rows) {
         let doc = row['doc']
-        let id=doc['_id']
+        let id = doc['_id']
         appState.worlds.set(id, doc)
     }
- })
+})
 
 
-appState.addMessage = action((args)=>{
+appState.getAllWorlds = () => {
+    return worlds.allDocs({ include_docs: true })
+}
+
+appState.addMessage = action((args) => {
     appState.connections.get(args['world_id']).messages.push(args['data'])
 })
 
@@ -33,7 +37,7 @@ appState.sendData = action((values, actions) => {
     )
 })
 
-appState.editWorld = action((value, actions)=>{
+appState.editWorld = action((value, actions) => {
     console.log(value)
 })
 
@@ -49,25 +53,25 @@ appState.addWorld = action((values, actions) => {
     })
 })
 
-appState.getSelectedMessages = action(()=>{
-    if(appState.selected_id){
+appState.getSelectedMessages = action(() => {
+    if (appState.selected_id) {
         return appState.connections[appState.selected_id]['messages']
     }
     return []
 })
 
-appState.addConnection = action((world)=>{
+appState.addConnection = action((world) => {
     let connection = {
         "world": world,
         "messages": []
     }
-    appState.connections.set(world['_id'],connection)
+    appState.connections.set(world['_id'], connection)
     appState.worlds.delete(world['_id'])
 })
 
 
-appState.closeConnection = action((args)=>{
-    if(args['error']){
+appState.closeConnection = action((args) => {
+    if (args['error']) {
         //Do something more useful than this.
         console.error(args['error'])
     }
@@ -76,12 +80,12 @@ appState.closeConnection = action((args)=>{
     appState.connections.delete(world['_id'])
 })
 
-appState.selectConnection = action((connection)=>{
+appState.selectConnection = action((connection) => {
     appState.selectedConnection = connection
     console.log("Selected")
 })
 
-appState.connectWorld = action((world)=>{
+appState.connectWorld = action((world) => {
     ipcRenderer.send('connectWorld', world)
 })
 

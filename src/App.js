@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link, Switch, MemoryRouter, Route } from 'react-router-dom'
+import { Link, MemoryRouter, Route } from 'react-router-dom'
 import ChatView from './views/chat_view'
 import SettingsView from './views/settings_view'
 
