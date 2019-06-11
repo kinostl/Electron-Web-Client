@@ -8,24 +8,25 @@ let worlds = new PouchDB('worlds')
 let appState = observable({
     selectedConnection: null,
     worlds: new Map(),
-    connections: new Map()
+    connections: new Map(),
+    allWorlds: []
 })
 
-worlds.allDocs({ include_docs: true }).then((results) => {
-    let rows = results['rows']
-    for (let row of rows) {
-        let doc = row['doc']
-        let id = doc['_id']
-        appState.worlds.set(id, doc)
-    }
+
+appState.getAllWorlds = action(() => {
+    worlds.allDocs({ include_docs: true }).then(action((results) => {
+        let worlds=[]
+        
+        for (let world of results['rows']) {
+            worlds.push(world['doc'])
+        }
+
+        appState.allWorlds = worlds
+    }))
 })
 
 appState.getWorldById = (id)=>{
     return worlds.get(id)
-}
-
-appState.getAllWorlds = () => {
-    return worlds.allDocs({ include_docs: true })
 }
 
 appState.addMessage = action((args) => {
@@ -48,9 +49,11 @@ appState.editWorld = action((value, actions) => {
         new_world['_rev'] = world._rev
         return worlds.put(new_world)
     }).then(()=>{
-        appState.world.set(world_id,new_world)
+        appState.worlds.set(world_id,new_world)
+        appState.getAllWorlds()
         actions.setSubmitting(false)
     }).catch((err)=>{
+        console.error(err)
         actions.setSubmitting(false)
         actions.setErrors(err)
     })    
@@ -61,6 +64,7 @@ appState.addWorld = action((values, actions) => {
     values['_id'] = _id
     worlds.put(values).then(function () {
         appState.worlds.set(_id, values)
+        appState.getAllWorlds()
         actions.setSubmitting(false)
     }).catch(function (err) {
         actions.setSubmitting(false)
@@ -103,5 +107,16 @@ appState.selectConnection = action((connection) => {
 appState.connectWorld = action((world) => {
     ipcRenderer.send('connectWorld', world)
 })
+
+worlds.allDocs({ include_docs: true }).then((results) => {
+    let rows = results['rows']
+    for (let row of rows) {
+        let doc = row['doc']
+        let id = doc['_id']
+        appState.worlds.set(id, doc)
+    }
+})
+
+appState.getAllWorlds()
 
 export default appState
