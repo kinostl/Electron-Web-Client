@@ -12,18 +12,28 @@ class EditWorld extends React.Component {
             "loading":true,
             "world":{}
         }
+        this.updateForm = this.updateForm.bind(this)
+    }
+
+    updateForm(props){
+        appState.getWorldById(props.match.params.world_id).then((world) => {
+            this.setState({
+                "loading":false,
+                "world":world
+            })
+        })
+    
     }
 
     componentDidMount(){
-        console.log(this.props)
-        if(this.state.loading){
-            appState.getWorldById(this.props.match.params.world_id).then((world) => {
-                console.log("Got world")
-                this.setState({
-                    "loading":false,
-                    "world":world
-                })
-            })    
+        this.setState({"loading":true})
+        this.updateForm(this.props)
+    }
+
+    componentDidUpdate(prevProps){
+        if(prevProps.match.params.world_id !== this.props.match.params.world_id){
+            this.setState({"loading":true})
+            this.updateForm(this.props)
         }
     }
 

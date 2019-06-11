@@ -30,6 +30,7 @@ class App extends React.Component {
         let worldOptions = [<li>
             <Link to="/settings/add_world">Add World</Link>
         </li>]
+        
         this.state.worlds.forEach((value) => {
             let destination = `/settings/${value['_id']}`
             worldOptions.push(<li key={value['_id']}>
