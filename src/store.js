@@ -20,6 +20,9 @@ worlds.allDocs({ include_docs: true }).then((results) => {
     }
 })
 
+appState.getWorldById = (id)=>{
+    return worlds.get(id)
+}
 
 appState.getAllWorlds = () => {
     return worlds.allDocs({ include_docs: true })
