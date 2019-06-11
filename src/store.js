@@ -41,7 +41,19 @@ appState.sendData = action((values, actions) => {
 })
 
 appState.editWorld = action((value, actions) => {
-    console.log(value)
+    let world_id=value['_id']
+    let new_world = value
+    worlds.get(world_id).then((world)=>{
+        new_world['_id'] = world_id
+        new_world['_rev'] = world._rev
+        return worlds.put(new_world)
+    }).then(()=>{
+        appState.world.set(world_id,new_world)
+        actions.setSubmitting(false)
+    }).catch((err)=>{
+        actions.setSubmitting(false)
+        actions.setErrors(err)
+    })    
 })
 
 appState.addWorld = action((values, actions) => {
