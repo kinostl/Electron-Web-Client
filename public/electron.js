@@ -8,15 +8,18 @@ const url = require('url')
 const isDev = require('electron-is-dev')
 
 const net = require('net')
-const { default: installExtension, REACT_DEVELOPER_TOOLS, MOBX_DEVTOOLS } = require('electron-devtools-installer')
 
-installExtension(REACT_DEVELOPER_TOOLS)
-  .then((name) => console.log(`Added Extension:  ${name}`))
-  .catch((err) => console.log('An error occurred: ', err))
+if (isDev) {
+  const { default: installExtension, REACT_DEVELOPER_TOOLS, MOBX_DEVTOOLS } = require('electron-devtools-installer')
 
-installExtension(MOBX_DEVTOOLS)
-  .then((name) => console.log(`Added Extension:  ${name}`))
-  .catch((err) => console.log('An error occurred: ', err))
+  installExtension(REACT_DEVELOPER_TOOLS)
+    .then((name) => console.log(`Added Extension:  ${name}`))
+    .catch((err) => console.log('An error occurred: ', err))
+
+  installExtension(MOBX_DEVTOOLS)
+    .then((name) => console.log(`Added Extension:  ${name}`))
+    .catch((err) => console.log('An error occurred: ', err))
+}
 
 let mainWindow
 let connections = new Map()
@@ -29,7 +32,9 @@ function createWindow() {
      nodeIntegration: true
    }
   })
-  mainWindow.webContents.openDevTools()
+  if(isDev){
+    mainWindow.webContents.openDevTools()
+  }
   mainWindow.loadURL(isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, '../build/index.html')}`)
 
   mainWindow.on('closed', () => mainWindow = null)

@@ -24,7 +24,7 @@
 		"test": "react-scripts test",
 		"eject": "react-scripts eject",
 		"electron-dev": "concurrently \"BROWSER=none npm start\" \"wait-on http://localhost:3000 && electron .\"",
-		"electron-pack": "build --em.main=build/electron.js",
+		"electron-pack": "build -c.extraMetadata.main=build/electron.js -w zip -l zip",
 		"preelectron-pack": "npm build"
 	},
 	"eslintConfig": {
@@ -47,6 +47,7 @@
 		"electron": "^5.0.2",
 		"electron-builder": "^20.43.0",
 		"electron-devtools-installer": "^2.2.4",
+		"typescript": "^3.5.1",
 		"wait-on": "^3.2.0"
 	},
 	"build": {
