@@ -30,7 +30,7 @@ appState.getWorldById = (id)=>{
 }
 
 appState.addMessage = action((args) => {
-    appState.connections.get(args['world_id']).messages.push(args['data'])
+    appState.connections.get(args['world_id']).messages.unshift(args['data'])
 })
 
 appState.sendData = action((values, actions) => {

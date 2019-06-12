@@ -1,5 +1,5 @@
 import React from 'react'
-import {observer} from 'mobx-react'
+import { observer } from 'mobx-react'
 import { Formik, Form, Field } from 'formik'
 import Ansi from 'ansi-to-react'
 
@@ -7,13 +7,12 @@ import appState from '../store'
 
 import './chat_window.css'
 
-class ChatWindow extends React.Component{
-
-  render(){
+class ChatWindow extends React.Component {
+  render() {
     let displayMessages = []
-    if(appState.selectedConnection){
+    if (appState.selectedConnection) {
       console.log(appState.selectedConnection.messages)
-      for(let appMessage of appState.selectedConnection.messages){
+      for (let appMessage of appState.selectedConnection.messages) {
         console.log(appMessage)
         displayMessages.push(
           <Ansi>
@@ -24,18 +23,21 @@ class ChatWindow extends React.Component{
     }
 
     return (
-      <div>
-        <div className="message">
+      <div className="chatWindow">
+        <div className="chatMessages">
           {displayMessages}
         </div>
-        <Formik initialValues={{ "message": "" }}
-          onSubmit={appState.sendData}
-          render={({errors, status, touched, isSubmitting})=>(
-            <Form>
-              <Field name="message" type="text"/>
-            </Form>
-          )}
-        />
+        <div className="chatInput">
+          <Formik
+            initialValues={{ "message": "" }}
+            onSubmit={appState.sendData}
+            render={({ errors, status, touched, isSubmitting }) => (
+              <Form>
+                <Field name="message" type="text" />
+              </Form>
+            )}
+          />
+        </div>
       </div>
     )
   }

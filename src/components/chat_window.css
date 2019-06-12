@@ -1,6 +1,27 @@
-.message{
+.chatWindow{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.chatMessages{
     white-space: pre-wrap;
     font-family: monospace;
     background-color: darkslategray;
     color: whitesmoke;
+    height: 100%;
+    overflow-y: scroll;
+
+    display: flex;
+    flex-direction: column-reverse;
+}
+
+.chatInput{
+    margin-top: auto;
+    width: 100%;
+}
+
+.chatInput *{
+    width: 100%;
 }
