@@ -86,6 +86,9 @@ appState.addConnection = action((world) => {
     }
     appState.connections.set(world['_id'], connection)
     appState.worlds.delete(world['_id'])
+    if(appState.selectedConnection === null){
+        appState.selectedConnection = appState.connections.get(world['_id'])
+    }
 })
 
 
@@ -95,8 +98,10 @@ appState.closeConnection = action((args) => {
         console.error(args['error'])
     }
     let world = appState.connections.get(args['world_id'])
+    world = world['world']
     appState.worlds.set(world['_id'], world)
     appState.connections.delete(world['_id'])
+    appState.selectedConnection = null
 })
 
 appState.selectConnection = action((connection) => {
