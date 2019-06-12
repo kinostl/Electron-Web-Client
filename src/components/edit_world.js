@@ -9,13 +9,16 @@ class EditWorld extends React.Component {
     constructor() {
         super()
         this.state = {
-            "world": {}
+            "world": {
+                "_deleted": false
+            }
         }
         this.updateForm = this.updateForm.bind(this)
     }
 
     updateForm(props) {
         appState.getWorldById(props.match.params.world_id).then((world) => {
+            world['_deleted'] = false
             this.setState({
                 "world": world
             })
@@ -29,12 +32,14 @@ class EditWorld extends React.Component {
 
     componentDidUpdate(prevProps) {
         if (prevProps.match.params.world_id !== this.props.match.params.world_id) {
+            console.log("Clip clop")
             this.updateForm(this.props)
         }
     }
 
     render() {
         return (
+            <div>
             <Formik initialValues={this.state.world}
                 enableReinitialize={true}
                 onSubmit={appState.editWorld}
@@ -61,12 +66,17 @@ class EditWorld extends React.Component {
                         <Field name="server_port" type="text" />
                         <ErrorMessage name="server_port" />
 
+                        <label htmlFor="_deleted">Delete World</label>
+                        <Field name="_deleted" type="checkbox" />
+                        <ErrorMessage name="_deleted" />
+
                         <button type="submit" disabled={isSubmitting}>
                             Save
             </button>
                     </Form>
 
                 )} />
+                </div>
         )
     }
 }

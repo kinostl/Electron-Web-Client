@@ -49,7 +49,11 @@ appState.editWorld = action((value, actions) => {
         new_world['_rev'] = world._rev
         return worlds.put(new_world)
     }).then(()=>{
-        appState.worlds.set(world_id,new_world)
+        if(new_world['_deleted']){
+            appState.worlds.delete(world_id)
+        }else{
+            appState.worlds.set(world_id,new_world)
+        }
         appState.getAllWorlds()
         actions.setSubmitting(false)
     }).catch((err)=>{

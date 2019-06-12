@@ -8,7 +8,7 @@
 	"dependencies": {
 		"ansi-to-react": "^5.0.0",
 		"electron-is-dev": "^1.1.0",
-		"formik": "^1.5.7",
+		"formik": "^2.0.1-rc.5",
 		"mobx": "^5.10.0",
 		"mobx-react": "^6.0.3",
 		"pouchdb-browser": "^7.0.0",
