@@ -5,35 +5,26 @@ import { NavLink } from 'react-router-dom'
 import appState from '../store';
 
 class ListWorlds extends React.Component {
-  constructor() {
-    super()
-    this.state = {
-      "worlds": new Map()
-    }
-  }
-
-  async updateList() {
-    let worlds = await appState.worlds()
-    this.setState({ "worlds": worlds })
-  }
-
-  async componentDidUpdate(){
-    await this.updateList()
-  }
-
-  async componentDidMount() {
-    await this.updateList()
+  async componentDidMount(){
+    await appState.updateWorlds()
   }
 
   render() {
     let worlds = []
 
-    this.state.worlds.forEach((world) => {
+    appState.worlds.forEach((world) => {
+      world = world['world']
       let dest = `/${world['_id']}`
+      let className=null
+      if(world.connected){
+        className="connected"
+      }
 
       worlds.push(<li key={world['_id']}>
         <NavLink to={dest}>
-          {world['label']}
+          <span className={className}>
+            {world['label']}
+          </span>
         </NavLink>
       </li>)
     })

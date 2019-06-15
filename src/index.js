@@ -9,20 +9,20 @@ import appState from './store'
 const {ipcRenderer} = window.require('electron')
 
 
-ipcRenderer.on('dataReceived', (event, arg) =>{
-  appState.addMessage(arg)
+ipcRenderer.on('dataReceived', async (event, arg) =>{
+  await appState.addMessage(arg)
 })
 
-ipcRenderer.on('connectionOpened', (event, arg)=>{
-  appState.addConnection(arg)
+ipcRenderer.on('connectionOpened', async (event, arg)=>{
+  await appState.addMessage(arg)
 })
 
-ipcRenderer.on('connectionClosed', (event, args)=>{
-  appState.closeConnection(args)
+ipcRenderer.on('connectionClosed', async (event, args)=>{
+  await appState.closeConnection(args)
 })
 
-ipcRenderer.on('connectionFailed', (event, args)=>{
-  appState.closeConnection(args)
+ipcRenderer.on('connectionFailed', async (event, args)=>{
+  await appState.closeConnection(args)
 })
 
 
