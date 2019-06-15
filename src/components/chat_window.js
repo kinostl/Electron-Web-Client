@@ -21,9 +21,9 @@ class ChatWindow extends React.Component {
 
   render() {
     let displayMessages = []
-    if (appState.selectedConnection) {
-      console.log(appState.selectedConnection.messages)
-      for (let appMessage of appState.selectedConnection.messages) {
+    if (appState.selectedWorld) {
+      console.log(appState.selectedWorld.messages)
+      for (let appMessage of appState.selectedWorld.messages) {
         console.log(appMessage)
         displayMessages.push(
           <Ansi>

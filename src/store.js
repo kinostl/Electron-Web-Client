@@ -10,7 +10,7 @@ class AppState {
     worldDb
     messages
 
-    constructor () {
+    constructor() {
         this.selectedWorld = null
         this.messages = new Map()
         this.worldDb = new PouchDB('worlds')
@@ -19,50 +19,44 @@ class AppState {
 
         this.addWorld = this.addWorld.bind(this)
         this.editWorld = this.editWorld.bind(this)
+        this.sendData = this.sendData.bind(this)
     }
 
-    async addMessage(args) {
+    addMessage(args) {
         let world_id = args['world_id']
-        if(!this.messages.has(world_id)){
-            this.messages.set(world_id,[])
+        if (this.worlds.has(world_id)) {
+            console.log("message received")
+            this.worlds.get(world_id).messages.unshift(args['data'])
+            console.log(this.worlds.get(world_id).messages)
         }
-        this.messages.get(world_id).unshift(args['data'])
     }
 
-    world = flow(function * (world_id){
+    world = flow(function* (world_id) {
         let world = yield this.worldDb.get(world_id)
         return world
     })
 
-    updateWorlds = flow(function * () {
-        let rows = yield this.worldDb.allDocs({"include_docs":true})
+    updateWorlds = flow(function* () {
+        let rows = yield this.worldDb.allDocs({ "include_docs": true })
         let worlds = new Map()
-        for(let row of rows['rows']){
+        for (let row of rows['rows']) {
             let world = row['doc']
             let new_world = null
-            if(this.worlds.has(world['_id'])){
+            if (this.worlds.has(world['_id'])) {
                 new_world = this.worlds.get(world['_id'])
-                new_world['world']=world
-            }else{
+                new_world['world'] = world
+            } else {
                 new_world = {
-                    "messages":[],
-                    "connected":false,
-                    "world":world
+                    "messages": [],
+                    "connected": false,
+                    "world": world
                 }
             }
-            worlds.set(world['_id'],new_world)
+            worlds.set(world['_id'], new_world)
         }
 
         this.worlds = worlds
     })
-
-    sendData(values, actions) {
-        actions.resetForm()
-        ipcRenderer.send('sendData',
-            this.selectedConnection['world']['_id'],
-            values['message']
-        )
-    }
 
     editWorld = flow(function* (values, actions) {
         try {
@@ -78,7 +72,7 @@ class AppState {
         actions.setSubmitting(false)
     })
 
-    addWorld = flow(function * (values, actions){
+    addWorld = flow(function* (values, actions) {
         try {
             values['_id'] = shortid.generate()
             yield this.worldDb.put(values)
@@ -90,18 +84,33 @@ class AppState {
         actions.selectConnection(false)
     })
 
-    async closeConnection(args) {
-        let world = await this.worldDb.get(args['world_id'])
-        if (args['error']) {
-            world.messages.unshift(args['error'])
+    sendData(values, actions) {
+        actions.resetForm()
+        if (this.selectedWorld) {
+            ipcRenderer.send('sendData',
+                this.selectedWorld['world']['_id'],
+                values['message']
+            )
         }
-        world.connected = false
     }
 
-    async selectWorld(world_id) {
-        this.selectedWorld = await this.worldDb.get(world_id)
-        if(!this.selectedWorld.connected){
-            ipcRenderer.send('connectWorld', this.selectedWorld)
+    closeConnection(args) {
+        let world = this.worlds.get(args['world_id'])
+        if (world) {
+            if (args['error']) {
+                world.messages.unshift(args['error'])
+            }
+            world.connected = false
+        }
+    }
+
+    selectWorld(world_id) {
+        this.selectedWorld = this.worlds.get(world_id)
+        if (this.selectedWorld) {
+            if (!this.selectedWorld.connected) {
+                console.log("selectedWorld", this.selectedWorld['world'])
+                ipcRenderer.send('connectWorld', this.selectedWorld['world'])
+            }
         }
     }
 }
