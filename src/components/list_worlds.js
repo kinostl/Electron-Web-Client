@@ -4,6 +4,8 @@ import { NavLink } from 'react-router-dom'
 
 import appState from '../store';
 
+import './list_worlds.css'
+
 class ListWorlds extends React.Component {
   async componentDidMount(){
     await appState.updateWorlds()
@@ -12,17 +14,18 @@ class ListWorlds extends React.Component {
   render() {
     let worlds = []
 
-    appState.worlds.forEach((world) => {
-      world = world['world']
+    appState.worlds.forEach((row) => {
+      console.log(row)
+      let world = row['world']
       let dest = `/${world['_id']}`
       let className=null
-      if(world.connected){
+      if(row['connected']){
         className="connected"
       }
 
-      worlds.push(<li key={world['_id']}>
-        <NavLink to={dest}>
-          <span className={className}>
+      worlds.push(<li key={world['_id']} className="world">
+        <NavLink to={dest} activeClassName="selected" className={className}>
+          <span>
             {world['label']}
           </span>
         </NavLink>

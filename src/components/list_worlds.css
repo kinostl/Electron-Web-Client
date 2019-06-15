@@ -1,0 +1,12 @@
+.world span{
+    height: 100%;
+    width: 100%;
+}
+
+.connected{
+    background-color: black;
+}
+
+.selected{
+    background-color: red;
+}

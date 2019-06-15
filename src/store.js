@@ -26,15 +26,11 @@ class AppState {
         let world_id = args['world_id']
         if (this.worlds.has(world_id)) {
             console.log("message received")
+            this.worlds.get(world_id).connected = true
             this.worlds.get(world_id).messages.unshift(args['data'])
             console.log(this.worlds.get(world_id).messages)
         }
     }
-
-    world = flow(function* (world_id) {
-        let world = yield this.worldDb.get(world_id)
-        return world
-    })
 
     updateWorlds = flow(function* () {
         let rows = yield this.worldDb.allDocs({ "include_docs": true })
