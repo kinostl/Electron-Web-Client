@@ -28,13 +28,15 @@ class AddWorld extends React.Component{
         <label htmlFor="name">Login Name</label>
         <Field name="name" type="text"/>
         <ErrorMessage name="name" />
+
         <label htmlFor="password">Password</label>
         <Field name="password" type="password"/>
-        <ErrorMessage name="name" />
+        <ErrorMessage name="password" />
 
         <label htmlFor="server_address">Server Address</label>
         <Field name="server_address" type="text"/>
         <ErrorMessage name="server_url" />
+        
         <label htmlFor="server_port">Server Port</label>
         <Field name="server_port" type="text"/>
         <ErrorMessage name="server_port" />

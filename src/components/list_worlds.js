@@ -1,42 +1,44 @@
 import React from 'react'
-import {observer} from 'mobx-react'
+import { observer } from 'mobx-react'
+import { NavLink } from 'react-router-dom'
 
 import appState from '../store';
 
-class ListWorlds extends React.Component{
+class ListWorlds extends React.Component {
+  constructor() {
+    super()
+    this.state = {
+      "worlds": new Map()
+    }
+  }
 
+  async updateList() {
+    let worlds = await appState.worlds()
+    this.setState({ "worlds": worlds })
+  }
 
+  async componentDidUpdate(){
+    await this.updateList()
+  }
 
-  render(){
+  async componentDidMount() {
+    await this.updateList()
+  }
+
+  render() {
     let worlds = []
-    let connections = []
 
-    appState.connections.forEach((connection)=>{
-      connections.push(<li key={connection['world']['_id']}>
-        <button onClick={(e)=>appState.selectConnection(connection)}>
-          {connection['world']['label']} [Connected]
-        </button>
-      </li>)
-    })
+    this.state.worlds.forEach((world) => {
+      let dest = `/${world['_id']}`
 
-    appState.worlds.forEach((world)=>{
       worlds.push(<li key={world['_id']}>
-          <button onClick={(e)=> appState.connectWorld(world)}>
-            {world['label']}
-          </button>
+        <NavLink to={dest}>
+          {world['label']}
+        </NavLink>
       </li>)
     })
 
-    return (
-      <div>
-        <ul>
-          {connections}
-        </ul>
-        <ul>
-          {worlds}
-        </ul>
-      </div>
-    )
+    return worlds
   }
 }
 

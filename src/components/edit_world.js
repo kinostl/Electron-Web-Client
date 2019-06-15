@@ -16,24 +16,23 @@ class EditWorld extends React.Component {
         this.updateForm = this.updateForm.bind(this)
     }
 
-    updateForm(props) {
-        appState.getWorldById(props.match.params.world_id).then((world) => {
-            world['_deleted'] = false
-            this.setState({
-                "world": world
-            })
+    async updateForm(props) {
+        let world_id = props.match.params.world_id
+        let world = await appState.world(world_id)
+        console.log(world)
+        world['_deleted'] = false
+        this.setState({
+            "world":world
         })
-
     }
 
-    componentDidMount() {
-        this.updateForm(this.props)
+    async componentDidMount() {
+        await this.updateForm(this.props)
     }
 
-    componentDidUpdate(prevProps) {
+    async componentDidUpdate(prevProps) {
         if (prevProps.match.params.world_id !== this.props.match.params.world_id) {
-            console.log("Clip clop")
-            this.updateForm(this.props)
+            await this.updateForm(this.props)
         }
     }
 
@@ -55,13 +54,15 @@ class EditWorld extends React.Component {
                         <label htmlFor="name">Login Name</label>
                         <Field name="name" type="text" />
                         <ErrorMessage name="name" />
+
                         <label htmlFor="password">Password</label>
                         <Field name="password" type="password" />
-                        <ErrorMessage name="name" />
+                        <ErrorMessage name="password" />
 
                         <label htmlFor="server_address">Server Address</label>
                         <Field name="server_address" type="text" />
                         <ErrorMessage name="server_url" />
+
                         <label htmlFor="server_port">Server Port</label>
                         <Field name="server_port" type="text" />
                         <ErrorMessage name="server_port" />

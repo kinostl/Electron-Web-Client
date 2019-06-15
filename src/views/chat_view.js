@@ -3,7 +3,9 @@ import React from 'react'
 import ListWorlds from '../components/list_worlds'
 import ChatWindow from '../components/chat_window'
 
-import { Link } from 'react-router-dom'
+import {observer} from 'mobx-react'
+
+import { Link, MemoryRouter, Route } from 'react-router-dom'
 
 import "./chat_view.css"
 
@@ -15,17 +17,18 @@ class ChatView extends React.Component {
                     <Link to="/settings">Settings</Link>
                 </nav>
                 <main>
-                    <div className="worldsList">
-                        <ListWorlds ></ListWorlds>
-                    </div>
-                    <div className="chatViewWindow">
-                        <ChatWindow></ChatWindow>
-                    </div>
-
+                    <MemoryRouter>
+                        <ul className="worldsList">
+                            <ListWorlds ></ListWorlds>
+                        </ul>
+                        <div className="chatWindow">
+                            <Route path="/:world_id" component={ChatWindow} />
+                        </div>
+                    </MemoryRouter>
                 </main>
             </div>
         )
     }
 }
 
-export default ChatView;
+export default observer(ChatView)

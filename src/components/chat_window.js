@@ -8,6 +8,17 @@ import appState from '../store'
 import './chat_window.css'
 
 class ChatWindow extends React.Component {
+  componentDidMount() {
+    console.log(this.props)
+    appState.selectWorld(this.props.match.params.world_id)
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.match.params.world_id !== this.props.match.params.world_id) {
+      appState.selectWorld(this.props.match.params.world_id)
+    }
+  }
+
   render() {
     let displayMessages = []
     if (appState.selectedConnection) {

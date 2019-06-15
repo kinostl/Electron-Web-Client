@@ -1,131 +1,106 @@
-import { observable, action } from 'mobx'
+import { observable, action, decorate } from 'mobx'
 import PouchDB from 'pouchdb-browser'
+import shortid from 'shortid'
 
 const { ipcRenderer } = window.require('electron')
+shortid.characters('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+-')
 
-let worlds = new PouchDB('worlds')
+class AppState {
+    selectedWorld
+    worldDb
 
-let appState = observable({
-    selectedConnection: null,
-    worlds: new Map(),
-    connections: new Map(),
-    allWorlds: []
-})
+    constructor () {
+        this.selectedWorld = null
+        this.worldDb = new PouchDB('worlds')
 
+        this.addWorld = this.addWorld.bind(this)
+        this.editWorld = this.editWorld.bind(this)
+    }
 
-appState.getAllWorlds = action(() => {
-    worlds.allDocs({ include_docs: true }).then(action((results) => {
-        let worlds=[]
-        
-        for (let world of results['rows']) {
-            worlds.push(world['doc'])
+    async addMessage(args) {
+        let world = await this.worldDb.get(args['world_id'])
+        world.messages.unshift(args['data'])
+        if (!world['connected']) {
+            world['connected'] = true
+        }
+    }
+
+    async world(world_id){
+        let world = await this.worldDb.get(world_id)
+        return world
+    }
+
+    async worlds(){
+        let rows = await this.worldDb.allDocs({"include_docs":true})
+        let worlds = []
+        for(let row of rows['rows']){
+            let world = row['doc']
+            worlds.push(world)
         }
 
-        appState.allWorlds = worlds
-    }))
-})
+        return worlds
+    }
 
-appState.getWorldById = (id)=>{
-    return worlds.get(id)
+    sendData(values, actions) {
+        actions.resetForm()
+        ipcRenderer.send('sendData',
+            this.selectedConnection['world']['_id'],
+            values['message']
+        )
+    }
+
+    async editWorld(values, actions) {
+        let world_id = values['_id']
+        let new_world = values
+        let world = await this.worldDb.get(world_id)
+        new_world['_rev'] = world._rev
+        try {
+            await this.worldDb.put(new_world)
+        } catch (err) {
+            actions.setErrors(err)
+        }
+        actions.setSubmitting(false)
+    }
+
+    async addWorld(values, actions) {
+        console.log(values)
+        values['_id'] = shortid.generate()
+        try {
+            await this.worldDb.put(values)
+        } catch (err) {
+            console.log(err)
+            actions.setErrors(err)
+        }
+        actions.selectConnection(false)
+    }
+
+    async closeConnection(args) {
+        let world = await this.worldDb.get(args['world_id'])
+        if (args['error']) {
+            world.messages.unshift(args['error'])
+        }
+        world.connected = false
+    }
+
+    async selectWorld(world_id) {
+        this.selectedWorld = await this.worldDb.get(world_id)
+        if(!this.selectedWorld.connected){
+            ipcRenderer.send('connectWorld', this.selectedWorld)
+        }
+    }
 }
 
-appState.addMessage = action((args) => {
-    appState.connections.get(args['world_id']).messages.unshift(args['data'])
+decorate(AppState, {
+    selectedWorld: observable,
+    worldDb: observable.ref,
+    addMessage: action,
+    addWorld: action,
+    closeConnection: action,
+    editWorld: action,
+    selectWorld: action,
+    sendData: action
 })
 
-appState.sendData = action((values, actions) => {
-    actions.resetForm()
-    ipcRenderer.send('sendData',
-        appState.selectedConnection['world']['_id'],
-        values['message']
-    )
-})
-
-appState.editWorld = action((value, actions) => {
-    let world_id=value['_id']
-    let new_world = value
-    worlds.get(world_id).then((world)=>{
-        new_world['_id'] = world_id
-        new_world['_rev'] = world._rev
-        return worlds.put(new_world)
-    }).then(()=>{
-        if(new_world['_deleted']){
-            appState.worlds.delete(world_id)
-        }else{
-            appState.worlds.set(world_id,new_world)
-        }
-        appState.getAllWorlds()
-        actions.setSubmitting(false)
-    }).catch((err)=>{
-        console.error(err)
-        actions.setSubmitting(false)
-        actions.setErrors(err)
-    })    
-})
-
-appState.addWorld = action((values, actions) => {
-    let _id = values['label'] + "@" + values['server_address'] + ":" + values['server_port']
-    values['_id'] = _id
-    worlds.put(values).then(function () {
-        appState.worlds.set(_id, values)
-        appState.getAllWorlds()
-        actions.setSubmitting(false)
-    }).catch(function (err) {
-        actions.setSubmitting(false)
-        actions.setErrors(err)
-    })
-})
-
-appState.getSelectedMessages = action(() => {
-    if (appState.selected_id) {
-        return appState.connections[appState.selected_id]['messages']
-    }
-    return []
-})
-
-appState.addConnection = action((world) => {
-    let connection = {
-        "world": world,
-        "messages": []
-    }
-    appState.connections.set(world['_id'], connection)
-    appState.worlds.delete(world['_id'])
-    if(appState.selectedConnection === null){
-        appState.selectedConnection = appState.connections.get(world['_id'])
-    }
-})
-
-
-appState.closeConnection = action((args) => {
-    if (args['error']) {
-        //Do something more useful than this.
-        console.error(args['error'])
-    }
-    let world = appState.connections.get(args['world_id'])
-    world = world['world']
-    appState.worlds.set(world['_id'], world)
-    appState.connections.delete(world['_id'])
-    appState.selectedConnection = null
-})
-
-appState.selectConnection = action((connection) => {
-    appState.selectedConnection = connection
-    console.log("Selected")
-})
-
-appState.connectWorld = action((world) => {
-    ipcRenderer.send('connectWorld', world)
-})
-
-worlds.allDocs({ include_docs: true }).then((results) => {
-    let rows = results['rows']
-    for (let row of rows) {
-        let doc = row['doc']
-        let id = doc['_id']
-        appState.worlds.set(id, doc)
-    }
-})
-
-appState.getAllWorlds()
+let appState = new AppState()
 
 export default appState
