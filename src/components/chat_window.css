@@ -8,8 +8,8 @@
 .chatMessages{
     white-space: pre-wrap;
     font-family: monospace;
-    background-color: darkslategray;
-    color: whitesmoke;
+    background-color: var(--chat-background);
+    color: var(--chat-foreground);
     height: 100%;
     overflow-y: scroll;
 

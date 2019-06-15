@@ -15,9 +15,5 @@
 }
 
 .worldsList{
-    grid-area: "worldsList";
-}
-
-.chatViewWindow{
-    width: 100%;
+    min-width: 10ch;
 }

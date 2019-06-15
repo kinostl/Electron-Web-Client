@@ -16,9 +16,10 @@ class EditWorld extends React.Component {
         this.updateForm = this.updateForm.bind(this)
     }
 
-    async updateForm(props) {
+    updateForm(props) {
         let world_id = props.match.params.world_id
-        let world = await appState.world(world_id)
+        let world = appState.worlds.get(world_id)
+        world=world['world']
         console.log(world)
         world['_deleted'] = false
         this.setState({
@@ -26,13 +27,13 @@ class EditWorld extends React.Component {
         })
     }
 
-    async componentDidMount() {
-        await this.updateForm(this.props)
+    componentDidMount() {
+        this.updateForm(this.props)
     }
 
-    async componentDidUpdate(prevProps) {
+    componentDidUpdate(prevProps) {
         if (prevProps.match.params.world_id !== this.props.match.params.world_id) {
-            await this.updateForm(this.props)
+            this.updateForm(this.props)
         }
     }
 

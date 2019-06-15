@@ -4,9 +4,9 @@
 }
 
 .connected{
-    background-color: black;
+    background-color: var(--connected);
 }
 
 .selected{
-    background-color: red;
+    background-color: var(--selected);
 }
