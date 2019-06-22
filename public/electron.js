@@ -29,10 +29,10 @@ function createWindow() {
     width: 900,
     height: 680,
     webPreferences: {
-     nodeIntegration: true
-   }
+      nodeIntegration: true
+    }
   })
-  if(isDev){
+  if (isDev) {
     mainWindow.webContents.openDevTools()
   }
   mainWindow.setMenuBarVisibility(false)
@@ -55,50 +55,57 @@ app.on('activate', () => {
   }
 })
 
-ipcMain.on('sendData',(event, world_id, data)=>{
-  let client=connections.get(world_id)
-  data = data+"\n\r"
+ipcMain.on('sendData', (event, world_id, data) => {
+  let client = connections.get(world_id)
+  data = data + "\n\r"
   client.write(data)
 })
 
-ipcMain.on('connectWorld',(event, world)=>{
+ipcMain.on('connectWorld', (event, world) => {
   console.log("Connecting world")
   console.log(world)
   let new_connection = new net.Socket()
   let world_id = world['_id']
-  new_connection.on('data', 
-  (data)=>{
-    mainWindow.webContents.send('dataReceived', {
-      "world_id": world_id,
-      "data": data.toString()
+  let world_port = world['server_port'] * 1
+  new_connection.on('data',
+    (data) => {
+      mainWindow.webContents.send('dataReceived', {
+        "world_id": world_id,
+        "data": data.toString()
+      })
     })
-  })
 
   new_connection.on('error', (err) => {
     console.log("Connection failed")
     console.log(err)
     mainWindow.webContents.send('connectionFailed', {
       "world_id": world_id,
-      "error": err
+      "error": "Connection error occured. Please check this world's settings."
     })
   })
 
-  new_connection.on('end', 
-  ()=>{
-    console.log("Closing connection")
-    mainWindow.webContents.send('connectionClosed', {
-      "world_id": world_id
-    })
-  })
-
-  console.log("Sending connection request")
-  new_connection.connect(
-    world['server_port'] * 1,
-    world['server_address'],
+  new_connection.on('end',
     () => {
-      console.log("Connected.")
-      connections.set(world['_id'], new_connection)
-      mainWindow.webContents.send('connectionOpened', world)
-
+      console.log("Closing connection")
+      mainWindow.webContents.send('connectionClosed', {
+        "world_id": world_id
+      })
     })
+
+  if (typeof world_port == 'number' && !isNaN(world_port)) {
+    console.log("Sending connection request")
+    new_connection.connect(
+      world_port,
+      world['server_address'],
+      () => {
+        console.log("Connected.")
+        connections.set(world['_id'], new_connection)
+        mainWindow.webContents.send('connectionOpened', world)
+      })
+  } else {
+    mainWindow.webContents.send('connectionFailed', {
+      "world_id": world_id,
+      "error": "NaN error occured. Port needs to be a real number. You can change the port in the Settings."
+    })
+  }
 })
