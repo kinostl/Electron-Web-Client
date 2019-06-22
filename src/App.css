@@ -1,10 +1,12 @@
 :root{
-    --interface-background: black;
-    --interface-foreground: white;
-    --selected: red;
-    --connected: green;
-    --chat-background: black;
-    --chat-foreground: whitesmoke;
+    --interface-background: #202225;
+    --interface-foreground: #fff;
+    --selected: #40444b;
+    --connected: #2f3136;
+    --chat-background: #36393f;
+    --chat-foreground: #dcddde;
+    --input-background: #484b52;
+    --input-foreground: #fff;
 }
 
 html{
@@ -33,4 +35,11 @@ ul, li{
 
 li{
     width: 100%;
+}
+
+a{
+    display: inline-block;
+    width: 100%;
+    color: var(--interface-foreground);
+    text-decoration: none;
 }

@@ -19,7 +19,7 @@ class AddWorld extends React.Component{
       render={({errors, status, touched, isSubmitting})=>(
       <Form>
         <header className="App-header">
-          Add Character
+          Add World
         </header>
         <label htmlFor="label">Label</label>
         <Field name="label" type="text"/>

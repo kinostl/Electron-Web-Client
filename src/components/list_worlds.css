@@ -1,6 +1,14 @@
+
 .world span{
     height: 100%;
     width: 100%;
+}
+
+.world a{
+    display: inline-block;
+    width: 100%;
+    color: var(--interface-foreground);
+    text-decoration: none;
 }
 
 .connected{

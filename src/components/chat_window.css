@@ -25,3 +25,9 @@
 .chatInput *{
     width: 100%;
 }
+
+.chatInput input{
+    background-color: var(--input-background);
+    color: var(--input-foreground);
+    border: none;
+}
